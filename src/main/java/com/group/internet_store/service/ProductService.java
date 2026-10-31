@@ -3,10 +3,13 @@ package com.group.internet_store.service;
 import com.group.internet_store.dto.ProductRequest;
 import com.group.internet_store.dto.ProductResponse;
 import com.group.internet_store.entity.Product;
+import com.group.internet_store.entity.User;
 import com.group.internet_store.exceptions.ProductNotFound;
 import com.group.internet_store.exceptions.ProductsListIsEmpty;
+import com.group.internet_store.exceptions.UserNotFound;
 import com.group.internet_store.mapper.ProductMapper;
 import com.group.internet_store.repository.ProductRepository;
+import com.group.internet_store.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,11 +24,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
-
+    private final UserRepository userRepository;
     private final ProductMapper productMapper;
 
-    public ProductResponse createProduct(ProductRequest productRequest) {
+    public ProductResponse createProduct(String username, ProductRequest productRequest) {
+        Optional<User> optUser = userRepository.getOptionalUserByUsername(username);
+        User user = optUser.orElseThrow(() -> new UserNotFound("User not found with username " + username));
         Product product = productMapper.productRequestToProduct(productRequest);
+        product.setUser(user);
         Product savedProduct = productRepository.save(product);
         return productMapper.productToProductResponse(savedProduct);
     }

@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -19,8 +20,9 @@ public class ProductController {
     private ProductService productService;
 
     @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(@RequestBody @Valid ProductRequest productRequest) {
-        ProductResponse productResponse = productService.createProduct(productRequest);
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody @Valid ProductRequest productRequest, Principal principal) {
+        String username = principal.getName();
+        ProductResponse productResponse = productService.createProduct(username,productRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(productResponse);
     }
 

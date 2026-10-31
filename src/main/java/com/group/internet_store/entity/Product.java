@@ -9,7 +9,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@Entity
+@Entity(name = "products")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,6 +22,9 @@ public class Product {
     private String createdAt;
     private String updatedAt;
     private long price;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @PrePersist
     protected void onCreate() {

@@ -47,4 +47,22 @@ public class GlobalExceptionHandler {
         );
         return errorResponse;
     }
+
+    @ExceptionHandler(UserNotFound.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse<String> handle(UserNotFound ex, HttpServletRequest request) {
+        ErrorResponse<String> errorResponse =  genericConstructor.construct(
+                ex.getClass().getName(),ex.getMessage(),HttpStatus.NOT_FOUND, request
+        );
+        return errorResponse;
+    }
+
+    @ExceptionHandler(UsernameAlreadyExists.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse<String> handle(UsernameAlreadyExists ex, HttpServletRequest request) {
+        ErrorResponse<String> errorResponse =  genericConstructor.construct(
+                ex.getClass().getName(),ex.getMessage(),HttpStatus.BAD_REQUEST, request
+        );
+        return errorResponse;
+    }
 }
