@@ -33,7 +33,7 @@ public class Product {
         this.createdAt = now.format(formatter);
     }
 
-    @PostUpdate
+    @PreUpdate
     protected void onUpdate() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy - H:mm:ss");

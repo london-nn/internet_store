@@ -53,10 +53,9 @@
 			<version>4.2.0-RC1</version>
 			<scope>compile</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		<!-- Source: https://mvnrepository.com/artifact/org.mapstruct/mapstruct -->

@@ -10,6 +10,7 @@ import com.group.internet_store.exceptions.UserNotFound;
 import com.group.internet_store.mapper.ProductMapper;
 import com.group.internet_store.repository.ProductRepository;
 import com.group.internet_store.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final ProductMapper productMapper;
+    private final EntityManager entityManager;
 
     public ProductResponse createProduct(String username, ProductRequest productRequest) {
         Optional<User> optUser = userRepository.getOptionalUserByUsername(username);
@@ -74,6 +76,7 @@ public class ProductService {
     public ProductResponse updateProduct(long id, ProductRequest productRequest) {
         Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFound("Product not found with id: " + id));
         productMapper.updateProductFromRequest(productRequest, product);
+        entityManager.flush();
         return productMapper.productToProductResponse(product);
     }
 }
