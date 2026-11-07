@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 
 @Getter
 @Setter
@@ -23,5 +25,5 @@ public class ProductRequest {
     private String description;
     @NotNull
     @Positive
-    private long price;
+    private BigDecimal price;
 }

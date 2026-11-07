@@ -13,7 +13,8 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
 
-    @Mapping( target = "updatedAt", source = "updatedAt", defaultValue = "no update")
+    @Mapping(target = "createdAt", source = "createdAt", dateFormat = "MMMM d, yyyy - H:mm:ss")
+    @Mapping(target = "updatedAt", source = "updatedAt", dateFormat = "MMMM d, yyyy - H:mm:ss", defaultValue = "no update")
     ProductResponse productToProductResponse(Product product);
 
     Product productRequestToProduct(ProductRequest productRequest);

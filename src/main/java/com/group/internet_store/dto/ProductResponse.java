@@ -3,6 +3,8 @@ package com.group.internet_store.dto;
 import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 
+import java.math.BigDecimal;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE,force=true)
@@ -12,5 +14,5 @@ public class ProductResponse {
     private final String description;
     private final String createdAt;
     private final String updatedAt;
-    private final long price;
+    private final BigDecimal price;
 }
