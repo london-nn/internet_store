@@ -5,6 +5,8 @@ import com.group.internet_store.dto.ProductResponse;
 import com.group.internet_store.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +29,9 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getProducts() {
-        List<ProductResponse> products = productService.getAllProducts();
+    public ResponseEntity<Page<ProductResponse>> getProducts(@RequestParam int pageNumber, @RequestParam int pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+        Page<ProductResponse> products = productService.getAllProducts(pageRequest);
         return ResponseEntity.ok().body(products);
     }
 

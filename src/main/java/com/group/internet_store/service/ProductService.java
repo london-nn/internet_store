@@ -13,6 +13,8 @@ import com.group.internet_store.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,16 +40,14 @@ public class ProductService {
         return productMapper.productToProductResponse(savedProduct);
     }
 
-    public List<ProductResponse> getAllProducts() {
-        List<Product> products = productRepository.findAll();
+    public Page<ProductResponse> getAllProducts(Pageable pageable) {
+        Page<Product> products = productRepository.findAll(pageable);
 
         if (products.isEmpty()) {
             throw new ProductsListIsEmpty("No products found");
         }
 
-        List<ProductResponse> productResponses = products.stream()
-                .map(productMapper::productToProductResponse)
-                .collect(Collectors.toList()); // .map(product -> productMapper.productToProductResponse(product))
+        Page<ProductResponse> productResponses = products.map(productMapper::productToProductResponse);
         return productResponses;
     }
 
