@@ -3,12 +3,16 @@ package com.group.internet_store.service;
 import com.group.internet_store.dto.CartResponse;
 import com.group.internet_store.entity.Cart;
 import com.group.internet_store.entity.CartItem;
+import com.group.internet_store.entity.Product;
 import com.group.internet_store.entity.User;
+import com.group.internet_store.exceptions.MustBeGreaterThanZero;
+import com.group.internet_store.exceptions.ProductNotFound;
 import com.group.internet_store.exceptions.UserNotFound;
 import com.group.internet_store.mapper.CartMapper;
 import com.group.internet_store.repository.CartRepository;
 import com.group.internet_store.repository.ProductRepository;
 import com.group.internet_store.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +40,37 @@ public class CartService {
             newCart.setUser(userFromDb);
             return cartRepository.save(newCart);
         });
+        return cartMapper.cartToCartResponse(cart);
+    }
+
+    @Transactional
+    public CartResponse addProductToCart(Principal principal, Long productId, int quantity) {
+        if(quantity <= 0){
+            throw new MustBeGreaterThanZero("Quantity must be positive and greater than 0");
+        }
+        String username = principal.getName();
+        User user = userRepository.getOptionalUserByUsername(username).orElseThrow(() -> new UserNotFound("User Not Found"));
+        Cart cart = cartRepository.findByUserId(user.getId()).orElseGet(() -> {
+            Cart newCart = new Cart();
+            newCart.setUser(user);
+            return cartRepository.save(newCart);
+        });
+        Optional<CartItem> optCartItem = cart.getCartItems().stream()
+                .filter(cartItem -> cartItem.getProduct().getId().equals(productId))
+                .findFirst();
+        if(optCartItem.isPresent()) {
+            CartItem cartItem = optCartItem.get();
+            cartItem.setQuantity(cartItem.getQuantity() + quantity);
+        } else {
+            Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFound("Product Not Found"));
+            CartItem cartItem = new CartItem();
+            cartItem.setCart(cart);
+            cartItem.setProduct(product);
+            cartItem.setQuantity(quantity);
+            cart.getCartItems().add(cartItem);
+
+        }
+        cartRepository.save(cart);
         return cartMapper.cartToCartResponse(cart);
     }
 }

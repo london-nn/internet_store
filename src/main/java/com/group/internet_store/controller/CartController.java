@@ -8,9 +8,7 @@ import com.group.internet_store.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -25,6 +23,12 @@ public class CartController {
     @GetMapping
     ResponseEntity<CartResponse> getCart(Principal principal) {
         CartResponse cartResponse = cartService.getCartByUser(principal);
+        return ResponseEntity.ok(cartResponse);
+    }
+
+    @PostMapping
+    ResponseEntity<CartResponse> addProductToCart(Principal principal, @RequestParam Long productId,@RequestParam int quantity) {
+        CartResponse cartResponse = cartService.addProductToCart(principal, productId, quantity);
         return ResponseEntity.ok(cartResponse);
     }
 }

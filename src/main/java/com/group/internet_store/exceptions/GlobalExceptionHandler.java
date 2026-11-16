@@ -65,4 +65,12 @@ public class GlobalExceptionHandler {
         );
         return errorResponse;
     }
+
+    @ExceptionHandler(MustBeGreaterThanZero.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse<String> handle(MustBeGreaterThanZero ex, HttpServletRequest request){
+        return genericConstructor.construct(
+                ex.getClass().getName(),ex.getMessage(),HttpStatus.BAD_REQUEST, request
+        );
+    }
 }
