@@ -24,8 +24,7 @@ public class CartController {
 
     @GetMapping
     ResponseEntity<CartResponse> getCart(Principal principal) {
-        User user = userRepository.getUserByUsername(principal.getName());
-        CartResponse cartResponse = cartService.getCartByUser(user.getId());
+        CartResponse cartResponse = cartService.getCartByUser(principal);
         return ResponseEntity.ok(cartResponse);
     }
 }
