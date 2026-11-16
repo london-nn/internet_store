@@ -12,6 +12,7 @@ import com.group.internet_store.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.Optional;
 
 @Service
@@ -25,12 +26,14 @@ public class CartService {
 
     private final CartMapper cartMapper;
 
-    public CartResponse getCartByUser(Long userId) {
-        Optional<Cart> optCart = cartRepository.findByUserId(userId);
+    public CartResponse getCartByUser(Principal principal) {
+        String username = principal.getName();
+        User user = userRepository.getUserByUsername(username);
+        Optional<Cart> optCart = cartRepository.findByUserId(user.getId());
         Cart cart = optCart.orElseGet(() -> {
-            User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFound("User Not Found"));
+            User userFromDb = userRepository.findById(user.getId()).orElseThrow(() -> new UserNotFound("User Not Found"));
             Cart newCart = new Cart();
-            newCart.setUser(user);
+            newCart.setUser(userFromDb);
             return cartRepository.save(newCart);
         });
         return cartMapper.cartToCartResponse(cart);
