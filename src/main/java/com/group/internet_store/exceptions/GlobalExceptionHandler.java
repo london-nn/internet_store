@@ -25,45 +25,40 @@ public class GlobalExceptionHandler {
         ex.getBindingResult().getFieldErrors().forEach(fieldError -> {
             errors.put(fieldError.getField(), fieldError.getDefaultMessage());
         });
-        ErrorResponse<Map<String,String>> errorResponse =  genericConstructor.construct(
+        return genericConstructor.construct(
                 ex.getClass().getName(), errors,HttpStatus.BAD_REQUEST, request);
-        return errorResponse;
     }
 
     @ExceptionHandler(ProductsListIsEmpty.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse<String> handle(ProductsListIsEmpty ex, HttpServletRequest request) {
-        ErrorResponse<String> errorResponse =  genericConstructor.construct(
+        return genericConstructor.construct(
                 ex.getClass().getName(),ex.getMessage(),HttpStatus.NOT_FOUND, request
         );
-        return errorResponse;
     }
 
     @ExceptionHandler(ProductNotFound.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse<String> handle(ProductNotFound ex, HttpServletRequest request) {
-        ErrorResponse<String> errorResponse =  genericConstructor.construct(
+        return genericConstructor.construct(
                 ex.getClass().getName(),ex.getMessage(),HttpStatus.NOT_FOUND, request
         );
-        return errorResponse;
     }
 
     @ExceptionHandler(UserNotFound.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse<String> handle(UserNotFound ex, HttpServletRequest request) {
-        ErrorResponse<String> errorResponse =  genericConstructor.construct(
+        return genericConstructor.construct(
                 ex.getClass().getName(),ex.getMessage(),HttpStatus.NOT_FOUND, request
         );
-        return errorResponse;
     }
 
     @ExceptionHandler(UsernameAlreadyExists.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse<String> handle(UsernameAlreadyExists ex, HttpServletRequest request) {
-        ErrorResponse<String> errorResponse =  genericConstructor.construct(
+        return genericConstructor.construct(
                 ex.getClass().getName(),ex.getMessage(),HttpStatus.BAD_REQUEST, request
         );
-        return errorResponse;
     }
 
     @ExceptionHandler(MustBeGreaterThanZero.class)
