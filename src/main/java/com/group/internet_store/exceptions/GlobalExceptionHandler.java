@@ -68,4 +68,12 @@ public class GlobalExceptionHandler {
                 ex.getClass().getName(),ex.getMessage(),HttpStatus.BAD_REQUEST, request
         );
     }
+
+    @ExceptionHandler(CartNotFound.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse<String> handle(CartNotFound ex, HttpServletRequest request){
+        return genericConstructor.construct(
+                ex.getClass().getName(),ex.getMessage(),HttpStatus.NOT_FOUND,request
+        );
+    }
 }
