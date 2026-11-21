@@ -31,8 +31,7 @@ public class CartService {
     private final CartMapper cartMapper;
 
     public CartResponse getCartByUser(Principal principal) {
-        String username = principal.getName();
-        User user = userRepository.getUserByUsername(username);
+        User user = getUserFromPrincipal(principal);
         Optional<Cart> optCart = cartRepository.findByUserId(user.getId());
         Cart cart = optCart.orElseGet(() -> {
             User userFromDb = userRepository.findById(user.getId()).orElseThrow(() -> new UserNotFound("User Not Found"));
@@ -48,8 +47,7 @@ public class CartService {
         if(quantity <= 0){
             throw new MustBeGreaterThanZero("Quantity must be positive and greater than 0");
         }
-        String username = principal.getName();
-        User user = userRepository.getOptionalUserByUsername(username).orElseThrow(() -> new UserNotFound("User Not Found"));
+        User user = getUserFromPrincipal(principal);
         Cart cart = cartRepository.findByUserId(user.getId()).orElseGet(() -> {
             Cart newCart = new Cart();
             newCart.setUser(user);
@@ -72,5 +70,9 @@ public class CartService {
         }
         cartRepository.save(cart);
         return cartMapper.cartToCartResponse(cart);
+    }
+    public User getUserFromPrincipal(Principal principal) {
+        String username = principal.getName();
+        return userRepository.getOptionalUserByUsername(username).orElseThrow(() -> new UserNotFound("User Not Found"));
     }
 }
