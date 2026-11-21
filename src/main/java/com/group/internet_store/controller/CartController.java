@@ -31,4 +31,22 @@ public class CartController {
         CartResponse cartResponse = cartService.addProductToCart(principal, productId, quantity);
         return ResponseEntity.ok(cartResponse);
     }
+
+    @DeleteMapping
+    ResponseEntity<CartResponse> removeProductFromCart(Principal principal, @RequestParam Long productId) {
+        CartResponse cartResponse = cartService.deleteCartItem(principal, productId);
+        return ResponseEntity.ok(cartResponse);
+    }
+
+    @PutMapping
+    ResponseEntity<CartResponse> updateProductQuantity(Principal principal, @RequestParam Long productId,@RequestParam int quantity) {
+        CartResponse cartResponse = cartService.updateProductQuantity(principal, productId, quantity);
+        return ResponseEntity.ok(cartResponse);
+    }
+
+    @DeleteMapping("/clearAll")
+    ResponseEntity<CartResponse> clearAllCart(Principal principal) {
+        CartResponse cartResponse = cartService.clearCart(principal);
+        return ResponseEntity.ok(cartResponse);
+    }
 }

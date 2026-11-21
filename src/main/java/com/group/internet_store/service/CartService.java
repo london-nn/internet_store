@@ -5,6 +5,7 @@ import com.group.internet_store.entity.Cart;
 import com.group.internet_store.entity.CartItem;
 import com.group.internet_store.entity.Product;
 import com.group.internet_store.entity.User;
+import com.group.internet_store.exceptions.CartNotFound;
 import com.group.internet_store.exceptions.MustBeGreaterThanZero;
 import com.group.internet_store.exceptions.ProductNotFound;
 import com.group.internet_store.exceptions.UserNotFound;
@@ -60,7 +61,7 @@ public class CartService {
             CartItem cartItem = optCartItem.get();
             cartItem.setQuantity(cartItem.getQuantity() + quantity);
         } else {
-            Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFound("Product Not Found"));
+            Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFound("Product not found"));
             CartItem cartItem = new CartItem();
             cartItem.setCart(cart);
             cartItem.setProduct(product);
@@ -71,6 +72,46 @@ public class CartService {
         cartRepository.save(cart);
         return cartMapper.cartToCartResponse(cart);
     }
+
+    @Transactional
+    public CartResponse deleteCartItem(Principal principal,Long productId) {
+        User user = getUserFromPrincipal(principal);
+        Cart cart = cartRepository.findByUserId(user.getId()).orElseThrow(() -> new CartNotFound("Cart not found"));
+        boolean removed = cart.getCartItems().removeIf(cartItem -> cartItem.getProduct().getId().equals(productId));
+        if(!removed) {
+            throw new ProductNotFound("Product not found in cart");
+        }
+        Cart savedCart = cartRepository.save(cart);
+        return cartMapper.cartToCartResponse(savedCart);
+    }
+
+    @Transactional
+    public CartResponse updateProductQuantity(Principal principal, Long productId, int quantity) {
+        User user = getUserFromPrincipal(principal);
+        Cart cart = cartRepository.findByUserId(user.getId()).orElseThrow(() -> new CartNotFound("Cart not found"));
+        CartItem cartItem = cart.getCartItems().stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst()
+                .orElseThrow(() -> new ProductNotFound("Product not found in cart"));
+            if(quantity > 0) {
+                cartItem.setQuantity(quantity);
+            }
+            else {
+                cart.getCartItems().remove(cartItem);
+            }
+        Cart savedCart = cartRepository.save(cart);
+        return cartMapper.cartToCartResponse(savedCart);
+    }
+
+    @Transactional
+    public CartResponse clearCart(Principal principal){
+        User user = getUserFromPrincipal(principal);
+        Cart cart = cartRepository.findByUserId(user.getId()).orElseThrow(() -> new CartNotFound("Cart not found"));
+        cart.getCartItems().clear();
+        Cart savedCart = cartRepository.save(cart);
+        return cartMapper.cartToCartResponse(savedCart);
+    }
+
     public User getUserFromPrincipal(Principal principal) {
         String username = principal.getName();
         return userRepository.getOptionalUserByUsername(username).orElseThrow(() -> new UserNotFound("User Not Found"));
