@@ -4,12 +4,14 @@ import com.group.internet_store.entity.User;
 import com.group.internet_store.exceptions.UserNotFound;
 import com.group.internet_store.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -26,10 +28,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UserNotFound("User not found with username: " + username);
         }
+        List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.name()))
+                .toList();
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
-                Collections.emptyList()
+                authorities
         );
     }
 }

@@ -1,13 +1,18 @@
 package com.group.internet_store.security;
 
+import com.group.internet_store.enums.Role;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class JwtUtils {
@@ -24,10 +29,27 @@ public class JwtUtils {
         this.secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, Collection<Role> roles) {
+        List<String> userRoles = roles.stream()
+                .map(Enum::name)
+                .toList();
         return Jwts.builder()
                 .subject(username)
                 .setIssuedAt(new Date())
+                .claim("roles",userRoles)
+                .expiration(new Date(new Date().getTime() + expirationMs))
+                .signWith(secretKey)
+                .compact();
+    }
+
+    public String generateToken(UserDetails userDetails) {
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+        return Jwts.builder()
+                .subject(userDetails.getUsername())
+                .setIssuedAt(new Date())
+                .claim("roles",roles)
                 .expiration(new Date(new Date().getTime() + expirationMs))
                 .signWith(secretKey)
                 .compact();

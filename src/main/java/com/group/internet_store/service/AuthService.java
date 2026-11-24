@@ -4,6 +4,7 @@ import com.group.internet_store.dto.UserLoginRequest;
 import com.group.internet_store.dto.UserRegistrationRequest;
 import com.group.internet_store.dto.UserResponse;
 import com.group.internet_store.entity.User;
+import com.group.internet_store.enums.Role;
 import com.group.internet_store.exceptions.UsernameAlreadyExists;
 import com.group.internet_store.mapper.ProductMapper;
 import com.group.internet_store.mapper.UserMapper;
@@ -15,10 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -33,8 +38,9 @@ public class AuthService {
         checkIfUsernameExists(user.getUsername());
         User newUser = userMapper.userRegistrationRequestToUser(user);
         newUser.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        newUser.getRoles().add(Role.ROLE_USER);
         User savedUser = userRepository.save(newUser);
-        String jwtToken = jwtUtils.generateToken(savedUser.getUsername());
+        String jwtToken = jwtUtils.generateToken(savedUser.getUsername(), savedUser.getRoles());
         UserResponse userResponse = userMapper.userToUserResponse(savedUser, jwtToken);
         return userResponse;
     }
@@ -45,7 +51,8 @@ public class AuthService {
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return jwtUtils.generateToken(userDetails.getUsername());
+        assert userDetails != null;
+        return jwtUtils.generateToken(userDetails);
     }
 
     public void checkIfUsernameExists(String username) {
